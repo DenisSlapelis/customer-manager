@@ -83,18 +83,6 @@ class CustomerDAO {
             throw new CustomError(err.message, 'MongoDB Error');
         });
     }
-
-    // getValidsUf = async () => {
-    //     const result = [];
-    //     const data = await localizations.find();
-
-    //     data.forEach(item => {
-    //         if (!result.includes(item.UF))
-    //             result.push(item.UF);
-    //     });
-
-    //     return result;
-    // }
 }
 
 module.exports = CustomerDAO;
