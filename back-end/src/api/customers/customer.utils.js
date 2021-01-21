@@ -9,7 +9,7 @@ class CustomerUtils {
         this.dao = new CustomerDAO();
     }
 
-    customerValidation = async ({ type, name, document, phone, uf, city, birthDate }) => {
+    newCustomerValidation = async ({ type, name, document, phone, uf, city, birthDate }) => {
         this.typeValidation(type);
         this.nameValidation(name);
         this.documentValidation(type, document);
@@ -18,6 +18,16 @@ class CustomerUtils {
         this.cityValidation(city);
         this.birthDateValidation(birthDate);
         await this.checksIfCustomerAlreadyExists(document);
+    }
+
+    updateCustomerValidation = async ({ id, type, name, document, phone, uf, city, birthDate }) => {
+        this.idValidation(id);
+        this.typeValidation(type);
+        this.nameValidation(name);
+        this.documentValidation(type, document);
+        this.phoneValidation(phone);
+        this.ufValidation(uf);
+        this.cityValidation(city);
     }
 
     validatePfArgs = (cnpj, uf, city) => {
@@ -30,6 +40,11 @@ class CustomerUtils {
         this.documentValidation('PJ', cnpj);
         this.ufValidation(uf);
         this.cityValidation(city);
+    }
+
+    idValidation = (id) => {
+        if (!id)
+            throw new CustomError('Required param id was not found', 'Validation Error');
     }
 
     typeValidation = (type) => {
@@ -112,7 +127,7 @@ class CustomerUtils {
         const formattedDocument = this.formatDocument(document);
         const result = await this.dao.getCustomerByDocument(formattedDocument);
 
-        if (result.length !== 0)
+        if (result && result.length !== 0)
             throw new CustomError("Customer already registered!", 'Validation Error');
     }
 

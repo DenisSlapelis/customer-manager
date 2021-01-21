@@ -19,14 +19,10 @@ const doc = {
     schemes: ['http'],
     consumes: ['application/json'],
     produces: ['application/json'],
-    tags: [
-        {
-            name: "KPI",
-            description: "Endpoints"
-        }
-    ],
     definitions: {
         Customers: model.customersResponse,
+        CustomersList: model.customersListResponse,
+        TotalCustomers: model.totalCustomersResponse,
         Localizations: model.localizationsResponse,
         CustomError: model.customError
     }

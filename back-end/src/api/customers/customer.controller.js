@@ -1,3 +1,4 @@
+const formatter = require('../../shared/format-error');
 const express = require('express');
 const router = express.Router();
 const CustomerService = require('./customer.service');
@@ -61,7 +62,7 @@ router.get('/PF/:cpf/:uf/:city', async (req, res) => {
         if (err.name && err.name === 'Validation Error')
             res.status(400).json(err);
         else
-            res.status(500).json(formatErrorResponse(err));
+            res.status(500).json(formatter.formatErrorResponse(err));
     }
 });
 
@@ -123,7 +124,7 @@ router.get('/PJ/:cnpj/:uf/:city', async (req, res) => {
         if (err.name && err.name === 'Validation Error')
             res.status(400).json(err);
         else
-            res.status(500).json(formatErrorResponse(err));
+            res.status(500).json(formatter.formatErrorResponse(err));
     }
 });
 
@@ -133,8 +134,6 @@ router.post('/', async (req, res) => {
         #swagger.tags = ['Customers']
         #swagger.description = 'Creates a new Customer if one does not already exist.'
         #swagger.path = '/api/v1/customers/'
-
-        type, name, document, phone, uf, city, birthDate
 
         == Params:
         #swagger.parameters['type'] = {
@@ -187,9 +186,9 @@ router.post('/', async (req, res) => {
         }
 
         == Successful response:
-        #swagger.responses[200] = {
-            schema: { $ref: "#/definitions/Customers" },
-            description: 'JSON data'
+        #swagger.responses[201] = {
+            schema: { },
+            description: 'Cusotmer was successfully created.'
         }
 
         == Error responses:
@@ -211,7 +210,203 @@ router.post('/', async (req, res) => {
         if (err.name && err.name === 'Validation Error')
             res.status(400).json(err);
         else
-            res.status(500).json(formatErrorResponse(err));
+            res.status(500).json(formatter.formatErrorResponse(err));
+    }
+});
+
+router.put('/', async (req, res) => {
+    /*
+        == Description
+        #swagger.tags = ['Customers']
+        #swagger.description = 'Updates a Customer.'
+        #swagger.path = '/api/v1/customers/'
+
+        == Params:
+        #swagger.parameters['id'] = {
+            in: 'body',
+            description: 'Customer id.',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['type'] = {
+            in: 'body',
+            description: 'Person type (PF/PJ).',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['name'] = {
+            in: 'body',
+            description: 'Customer name.',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['document'] = {
+            in: 'body',
+            description: 'Customer document (CPF/CNPJ).',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['uf'] = {
+            in: 'body',
+            description: 'Customer UF.',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['city'] = {
+            in: 'body',
+            description: 'Customer city.',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['phone'] = {
+            in: 'body',
+            description: 'Customer phone number.',
+            required: true,
+            type: 'string'
+        }
+
+        == Successful response:
+        #swagger.responses[200] = {
+            schema: { },
+            description: 'Cusotmer was successfully updated.'
+        }
+
+        == Error responses:
+        #swagger.responses[400] = {
+            schema: { $ref: "#/definitions/CustomError" },
+            description: 'Validation Error'
+        }
+
+        #swagger.responses[500] = {
+            schema: { $ref: "#/definitions/CustomError" },
+            description: 'Unexpected error'
+        }
+    */
+
+    try {
+        await service.updateCustomer(req.body);
+        res.status(200).send();
+    } catch (err) {
+        if (err.name && err.name === 'Validation Error')
+            res.status(400).json(err);
+        else
+            res.status(500).json(formatter.formatErrorResponse(err));
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    /*
+        == Description
+        #swagger.tags = ['Customers']
+        #swagger.description = 'Removes a Customer.'
+        #swagger.path = '/api/v1/customers/'
+
+        == Params:
+        #swagger.parameters['id'] = {
+            in: 'path',
+            description: 'Customer id.',
+            required: true,
+            type: 'string'
+        }
+
+        == Successful response:
+        #swagger.responses[200] = {
+            schema: { },
+            description: 'Cusotmer was successfully removed.'
+        }
+
+        == Error responses:
+        #swagger.responses[500] = {
+            schema: { $ref: "#/definitions/CustomError" },
+            description: 'Unexpected error'
+        }
+    */
+
+    try {
+        const id = req.params.id;
+        await service.removeCustomer(id);
+        res.status(200).send();
+    } catch (err) {
+        res.status(500).json(formatter.formatErrorResponse(err));
+    }
+});
+
+router.get('/', async (req, res) => {
+    /*
+        == Description
+        #swagger.tags = ['Customers']
+        #swagger.description = 'Returns a paginated Customer list.'
+        #swagger.path = '/api/v1/customers/'
+
+        == Params:
+        #swagger.parameters['page'] = {
+            in: 'query',
+            description: 'Page.',
+            required: true,
+            type: 'string'
+        }
+
+        #swagger.parameters['itemsPerPage'] = {
+            in: 'query',
+            description: 'items per page.',
+            required: true,
+            type: 'string'
+        }
+
+        == Successful response:
+        #swagger.responses[200] = {
+            schema: { $ref: "#/definitions/CustomersList" },
+            description: 'JSON Data.'
+        }
+
+        == Error responses:
+        #swagger.responses[500] = {
+            schema: { $ref: "#/definitions/CustomError" },
+            description: 'Unexpected error'
+        }
+    */
+
+    try {
+        const page = req.query.page;
+        const itemsPerPage = req.query.itemsPerPage;
+        const result = await service.getPaginatedCustomerList(page, itemsPerPage);
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json(formatter.formatErrorResponse(err));
+    }
+});
+
+router.get('/total', async (req, res) => {
+    /*
+        == Description
+        #swagger.tags = ['Customers']
+        #swagger.description = 'Returns total number of Customers.'
+        #swagger.path = '/api/v1/customers/total'
+
+        == Successful response:
+        #swagger.responses[200] = {
+            schema: { $ref: "#/definitions/TotalCustomers" },
+            description: 'JSON Data.'
+        }
+
+        == Error responses:
+        #swagger.responses[500] = {
+            schema: { $ref: "#/definitions/CustomError" },
+            description: 'Unexpected error'
+        }
+    */
+
+    try {
+        const result = await service.getTotalCustomers();
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json(formatter.formatErrorResponse(err));
     }
 });
 

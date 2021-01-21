@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-dotenv.config();
+const environment = require('../environment/environment');
 
-const username = process.env.DB_USER;
-const password = process.env.DB_PASS;
-const dbName = process.env.DB_NAME;
+const username = environment.dbUser;
+const password = environment.dbPass;
+const dbName = environment.dbName;
 
 const uri = `mongodb+srv://${username}:${password}@cluster0.tekok.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 const options = {

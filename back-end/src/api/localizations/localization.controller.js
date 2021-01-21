@@ -1,3 +1,4 @@
+const formatter = require('../../shared/format-error');
 const express = require('express');
 const router = express.Router();
 const LocalizationSerivce = require('./localization.service');
@@ -35,7 +36,7 @@ router.get('/', async (req, res) => {
         if (err.name && err.name === 'Validation Error')
             res.status(400).json(err);
         else
-            res.status(500).json(formatErrorResponse(err));
+            res.status(500).json(formatter.formatErrorResponse(err));
     }
 });
 

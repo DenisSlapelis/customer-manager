@@ -7,12 +7,7 @@
   },
   "host": "localhost:3000",
   "basePath": "/api/v1/",
-  "tags": [
-    {
-      "name": "KPI",
-      "description": "Endpoints"
-    }
-  ],
+  "tags": [],
   "schemes": [
     "http"
   ],
@@ -184,19 +179,193 @@
           }
         ],
         "responses": {
-          "200": {
-            "schema": {
-              "$ref": "#/definitions/Customers"
-            },
-            "description": "JSON data"
-          },
           "201": {
-            "description": "Created"
+            "description": "Cusotmer was successfully created.",
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
             "description": "Validation Error",
             "schema": {
               "$ref": "#/definitions/CustomError"
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Customers"
+        ],
+        "description": "Updates a Customer.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "body",
+            "description": "Customer id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "body",
+            "description": "Person type (PF/PJ).",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "body",
+            "description": "Customer name.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "document",
+            "in": "body",
+            "description": "Customer document (CPF/CNPJ).",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "uf",
+            "in": "body",
+            "description": "Customer UF.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "in": "body",
+            "description": "Customer city.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phone",
+            "in": "body",
+            "description": "Customer phone number.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cusotmer was successfully updated.",
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "description": "Removes a Customer.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Customer id.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cusotmer was successfully removed.",
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "description": "Returns a paginated Customer list.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "description": "items per page.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON Data.",
+            "schema": {
+              "$ref": "#/definitions/CustomersList"
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/customers/total": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "description": "Returns total number of Customers.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "JSON Data.",
+            "schema": {
+              "$ref": "#/definitions/TotalCustomers"
             }
           },
           "500": {
@@ -281,6 +450,62 @@
       },
       "xml": {
         "name": "Customers"
+      }
+    },
+    "CustomersList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "6009afc5d936e73bc8f952e8"
+          },
+          "type": {
+            "type": "string",
+            "example": "PF"
+          },
+          "name": {
+            "type": "string",
+            "example": "Denis Slapelis"
+          },
+          "document": {
+            "type": "number",
+            "example": 37303052046
+          },
+          "phone": {
+            "type": "string",
+            "example": "(11) 98964-3889"
+          },
+          "uf": {
+            "type": "string",
+            "example": "SP"
+          },
+          "city": {
+            "type": "string",
+            "example": "São Paulo"
+          },
+          "birthDate": {
+            "type": "string",
+            "example": "1996-12-10T02:00:00.000Z"
+          },
+          "__v": {
+            "type": "number",
+            "example": 0
+          }
+        }
+      },
+      "xml": {
+        "name": "CustomersList"
+      }
+    },
+    "TotalCustomers": {
+      "6": {
+        "example": 6
+      },
+      "type": "number",
+      "xml": {
+        "name": "TotalCustomers"
       }
     },
     "Localizations": {
