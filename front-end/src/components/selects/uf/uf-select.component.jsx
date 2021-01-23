@@ -16,19 +16,30 @@ const UFSelect = ({ register, onChange, defaultValue }) => {
 
     return (
         (loadingData) ?
-            <select defaultValue={"default"} name="UF">
-                <option value="default" disabled hidden>UF</option>
-                <option disabled></option>
-            </select>
-            :
-            <span>
-                <select name="UF" defaultValue={defaultValue ? defaultValue : "default"} onChange={onChange} ref={register}>
+            <div>
+                <p>teste 1</p>
+                <select defaultValue={"default"} name="UF">
                     <option value="default" disabled hidden>UF</option>
-                    {UFList.map(UF =>
-                        <option key={UF} value={UF}>{UF}</option>
-                    )}
+                    <option disabled></option>
                 </select>
-            </span>
+            </div>
+            :
+            (!loadingData && !defaultValue) ?
+                <div>
+                    <select name="UF" defaultValue={"default"} onChange={onChange} ref={register}>
+                        <option value="default" disabled hidden>UF</option>
+                        {UFList.map(UF =>
+                            <option key={UF} value={UF}>{UF}</option>
+                        )}
+                    </select>
+                </div> :
+                <span>
+                    <select name="UF" defaultValue={defaultValue} onChange={onChange} ref={register}>
+                        {UFList.map(UF =>
+                            <option key={UF} value={UF}>{UF}</option>
+                        )}
+                    </select>
+                </span>
     )
 }
 
