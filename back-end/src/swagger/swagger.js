@@ -22,8 +22,8 @@ const doc = {
     definitions: {
         Customers: model.customersResponse,
         CustomersList: model.customersListResponse,
-        TotalCustomers: model.totalCustomersResponse,
         Localizations: model.localizationsResponse,
+        Cities: model.citiesResponse,
         CustomError: model.customError
     }
 }

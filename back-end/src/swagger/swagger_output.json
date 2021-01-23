@@ -19,7 +19,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/customers/{cpf}/{uf}/{city}": {
+    "/api/v1/customers/{cpf}/{UF}/{city}": {
       "get": {
         "tags": [
           "Customers"
@@ -34,7 +34,7 @@
             "description": "Customer document (CPF)."
           },
           {
-            "name": "uf",
+            "name": "UF",
             "in": "path",
             "required": true,
             "type": "string",
@@ -70,7 +70,7 @@
         }
       }
     },
-    "/api/v1/customers/{cnpj}/{uf}/{city}": {
+    "/api/v1/customers/{cnpj}/{UF}/{city}": {
       "get": {
         "tags": [
           "Customers"
@@ -85,7 +85,7 @@
             "description": "Customer document (CNPJ)."
           },
           {
-            "name": "uf",
+            "name": "UF",
             "in": "path",
             "required": true,
             "type": "string",
@@ -129,7 +129,7 @@
         "description": "Creates a new Customer if one does not already exist.",
         "parameters": [
           {
-            "name": "type",
+            "name": "personType",
             "in": "body",
             "description": "Person type (PF/PJ).",
             "required": true,
@@ -157,7 +157,7 @@
             "type": "string"
           },
           {
-            "name": "uf",
+            "name": "UF",
             "in": "body",
             "description": "Customer UF.",
             "required": true,
@@ -203,6 +203,44 @@
           }
         }
       },
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "description": "Returns a paginated Customer list.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "description": "items per page.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON Data.",
+            "schema": {
+              "$ref": "#/definitions/CustomersList"
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/customers/{id}": {
       "put": {
         "tags": [
           "Customers"
@@ -211,13 +249,13 @@
         "parameters": [
           {
             "name": "id",
-            "in": "body",
-            "description": "Customer id.",
+            "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Customer id."
           },
           {
-            "name": "type",
+            "name": "personType",
             "in": "body",
             "description": "Person type (PF/PJ).",
             "required": true,
@@ -293,9 +331,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Customer id.",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Customer id."
           }
         ],
         "responses": {
@@ -321,51 +359,21 @@
         "tags": [
           "Customers"
         ],
-        "description": "Returns a paginated Customer list.",
+        "description": "Returns a Customer by id.",
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
-            "description": "Page.",
+            "name": "id",
+            "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "itemsPerPage",
-            "in": "query",
-            "description": "items per page.",
-            "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Customer id."
           }
         ],
         "responses": {
           "200": {
             "description": "JSON Data.",
             "schema": {
-              "$ref": "#/definitions/CustomersList"
-            }
-          },
-          "500": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/CustomError"
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/customers/total": {
-      "get": {
-        "tags": [
-          "Customers"
-        ],
-        "description": "Returns total number of Customers.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "JSON Data.",
-            "schema": {
-              "$ref": "#/definitions/TotalCustomers"
+              "$ref": "#/definitions/Customers"
             }
           },
           "500": {
@@ -389,6 +397,42 @@
             "description": "JSON data",
             "schema": {
               "$ref": "#/definitions/Localizations"
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/CustomError"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/localizations/{UF}": {
+      "get": {
+        "tags": [
+          "Localizations"
+        ],
+        "description": "Get all cities from UF.",
+        "parameters": [
+          {
+            "name": "UF",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON data",
+            "schema": {
+              "$ref": "#/definitions/Cities"
             }
           },
           "400": {
@@ -499,15 +543,6 @@
         "name": "CustomersList"
       }
     },
-    "TotalCustomers": {
-      "6": {
-        "example": 6
-      },
-      "type": "number",
-      "xml": {
-        "name": "TotalCustomers"
-      }
-    },
     "Localizations": {
       "type": "array",
       "items": {
@@ -533,6 +568,33 @@
       },
       "xml": {
         "name": "Localizations"
+      }
+    },
+    "Cities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "6008b6ab348e2f3ac8f7f87e"
+          },
+          "UF": {
+            "type": "string",
+            "example": "SP"
+          },
+          "city": {
+            "type": "string",
+            "example": "São Paulo"
+          },
+          "__v": {
+            "type": "number",
+            "example": 0
+          }
+        }
+      },
+      "xml": {
+        "name": "Cities"
       }
     },
     "CustomError": {

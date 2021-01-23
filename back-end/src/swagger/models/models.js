@@ -85,6 +85,33 @@ exports.localizationsResponse = [
     }
 ];
 
+exports.citiesResponse = [
+    {
+        "_id": "6008b6ab348e2f3ac8f7f880",
+        "UF": "SP",
+        "city": "Campinas",
+        "__v": 0
+    },
+    {
+        "_id": "6008b6ab348e2f3ac8f7f87f",
+        "UF": "SP",
+        "city": "Guarulhos",
+        "__v": 0
+    },
+    {
+        "_id": "6008b6ab348e2f3ac8f7f881",
+        "UF": "SP",
+        "city": "Osasco",
+        "__v": 0
+    },
+    {
+        "_id": "6008b6ab348e2f3ac8f7f87e",
+        "UF": "SP",
+        "city": "São Paulo",
+        "__v": 0
+    }
+];
+
 exports.customError = {
     name: 'Error type',
     message: ['Error message'],
