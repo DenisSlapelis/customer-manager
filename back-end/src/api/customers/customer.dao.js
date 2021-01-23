@@ -1,10 +1,18 @@
 const CustomError = require('../../shared/custom-error');
 const customers = require('../../db/schemas/customers.schema');
-const localizations = require('../../db/schemas/localizations.schema');
 
 class CustomerDAO {
-    getCustomerByDocumentUfCity = async (document, uf, city) => {
-        const data = await customers.findOne({ document: Number.parseInt(document), uf: uf, city: city }).catch(err => {
+    getCustomerByDocumentUFCity = async (document, UF, city) => {
+        const data = await customers.findOne({ document: Number.parseInt(document), UF: UF, city: city }).catch(err => {
+            console.log('error: ', err)
+            throw new CustomError(err.message, 'MongoDB Error');
+        });
+
+        return data;
+    }
+
+    getCustomerById = async (id) => {
+        const data = await customers.findOne({ _id: id }).catch(err => {
             console.log('error: ', err)
             throw new CustomError(err.message, 'MongoDB Error');
         });
@@ -41,11 +49,10 @@ class CustomerDAO {
         return data;
     }
 
-
-    insertNewCustomer = async ({ type, name, document, phone, uf, city, birthDate }) => {
+    insertNewCustomer = async ({ personType, name, document, phone, UF, city, birthDate }) => {
         const doc = [
             {
-                type, name, document, phone, uf, city, birthDate
+                personType, name, document, phone, UF, city, birthDate
             }
         ];
 
@@ -55,15 +62,15 @@ class CustomerDAO {
         });
     }
 
-    updateCustomerById = async ({ id, type, name, document, uf, city, phone }) => {
+    updateCustomerById = async ({ id, personType, name, document, UF, city, phone }) => {
         const filter = { _id: id };
         const options = { upsert: false };
         const updateDoc = {
             $set: {
-                type: type,
+                personType: personType,
                 name: name,
                 document: document,
-                uf: uf,
+                UF: UF,
                 city: city,
                 phone: phone
             },

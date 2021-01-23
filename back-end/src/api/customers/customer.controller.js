@@ -4,12 +4,12 @@ const router = express.Router();
 const CustomerService = require('./customer.service');
 const service = new CustomerService();
 
-router.get('/PF/:cpf/:uf/:city', async (req, res) => {
+router.get('/PF/:cpf/:UF/:city', async (req, res) => {
     /*
         == Description
         #swagger.tags = ['Customers']
         #swagger.description = 'Get PF customer data from MongoDB database.'
-        #swagger.path = '/api/v1/customers/{cpf}/{uf}/{city}'
+        #swagger.path = '/api/v1/customers/{cpf}/{UF}/{city}'
  
         == Params:
         #swagger.parameters['cpf'] = {
@@ -19,7 +19,7 @@ router.get('/PF/:cpf/:uf/:city', async (req, res) => {
             type: 'string'
         }
 
-        #swagger.parameters['uf'] = {
+        #swagger.parameters['UF'] = {
             in: 'path',
             description: 'Customer UF.',
             required: true,
@@ -53,9 +53,9 @@ router.get('/PF/:cpf/:uf/:city', async (req, res) => {
 
     try {
         const cpf = req.params.cpf;
-        const uf = req.params.uf;
+        const UF = req.params.UF;
         const city = req.params.city;
-        const result = await service.getCustomerByCpf(cpf, uf, city);
+        const result = await service.getCustomerByCpf(cpf, UF, city);
 
         res.status(200).json(result);
     } catch (err) {
@@ -66,12 +66,12 @@ router.get('/PF/:cpf/:uf/:city', async (req, res) => {
     }
 });
 
-router.get('/PJ/:cnpj/:uf/:city', async (req, res) => {
+router.get('/PJ/:cnpj/:UF/:city', async (req, res) => {
     /*
         == Description
         #swagger.tags = ['Customers']
         #swagger.description = 'Get PJ customer data from MongoDB database.'
-        #swagger.path = '/api/v1/customers/{cnpj}/{uf}/{city}'
+        #swagger.path = '/api/v1/customers/{cnpj}/{UF}/{city}'
  
         == Params:
         #swagger.parameters['cnpj'] = {
@@ -81,7 +81,7 @@ router.get('/PJ/:cnpj/:uf/:city', async (req, res) => {
             type: 'string'
         }
 
-        #swagger.parameters['uf'] = {
+        #swagger.parameters['UF'] = {
             in: 'path',
             description: 'Customer UF.',
             required: true,
@@ -115,9 +115,9 @@ router.get('/PJ/:cnpj/:uf/:city', async (req, res) => {
 
     try {
         const cnpj = req.params.cnpj;
-        const uf = req.path.uf;
+        const UF = req.path.UF;
         const city = req.path.city;
-        const result = await service.getCustomerByCnpjUfCity(cnpj, uf, city);
+        const result = await service.getCustomerByCnpjUfCity(cnpj, UF, city);
 
         res.status(200).json(result);
     } catch (err) {
@@ -136,7 +136,7 @@ router.post('/', async (req, res) => {
         #swagger.path = '/api/v1/customers/'
 
         == Params:
-        #swagger.parameters['type'] = {
+        #swagger.parameters['personType'] = {
             in: 'body',
             description: 'Person type (PF/PJ).',
             required: true,
@@ -164,7 +164,7 @@ router.post('/', async (req, res) => {
             type: 'string'
         }
 
-        #swagger.parameters['uf'] = {
+        #swagger.parameters['UF'] = {
             in: 'body',
             description: 'Customer UF.',
             required: true,
@@ -214,22 +214,22 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/', async (req, res) => {
+router.put('/:id', async (req, res) => {
     /*
         == Description
         #swagger.tags = ['Customers']
         #swagger.description = 'Updates a Customer.'
-        #swagger.path = '/api/v1/customers/'
+        #swagger.path = '/api/v1/customers/{id}'
 
         == Params:
         #swagger.parameters['id'] = {
-            in: 'body',
+            in: 'path',
             description: 'Customer id.',
             required: true,
             type: 'string'
         }
 
-        #swagger.parameters['type'] = {
+        #swagger.parameters['personType'] = {
             in: 'body',
             description: 'Person type (PF/PJ).',
             required: true,
@@ -290,7 +290,8 @@ router.put('/', async (req, res) => {
     */
 
     try {
-        await service.updateCustomer(req.body);
+        const id = req.params.id;
+        await service.updateCustomer({ id, ...req.body });
         res.status(200).send();
     } catch (err) {
         if (err.name && err.name === 'Validation Error')
@@ -305,7 +306,7 @@ router.delete('/:id', async (req, res) => {
         == Description
         #swagger.tags = ['Customers']
         #swagger.description = 'Removes a Customer.'
-        #swagger.path = '/api/v1/customers/'
+        #swagger.path = '/api/v1/customers/{id}'
 
         == Params:
         #swagger.parameters['id'] = {
@@ -382,16 +383,24 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/total', async (req, res) => {
+router.get('/:id', async (req, res) => {
     /*
         == Description
         #swagger.tags = ['Customers']
-        #swagger.description = 'Returns total number of Customers.'
-        #swagger.path = '/api/v1/customers/total'
+        #swagger.description = 'Returns a Customer by id.'
+        #swagger.path = '/api/v1/customers/{id}'
+
+        == Params:
+        #swagger.parameters['id'] = {
+            in: 'path',
+            description: 'Customer id.',
+            required: true,
+            type: 'string'
+        }
 
         == Successful response:
         #swagger.responses[200] = {
-            schema: { $ref: "#/definitions/TotalCustomers" },
+            schema: { $ref: "#/definitions/Customers" },
             description: 'JSON Data.'
         }
 
@@ -403,7 +412,8 @@ router.get('/total', async (req, res) => {
     */
 
     try {
-        const result = await service.getTotalCustomers();
+        const id = req.params.id;
+        const result = await service.getCustomerById(id);
         res.status(200).json(result);
     } catch (err) {
         res.status(500).json(formatter.formatErrorResponse(err));

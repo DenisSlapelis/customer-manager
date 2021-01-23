@@ -7,26 +7,30 @@ class CustomerService {
         this.utils = new CustomerUtils();
     }
 
-    insertNewCustomer = async ({ type, name, document, phone, uf, city, birthDate }) => {
-        await this.utils.newCustomerValidation({ type, name, document, phone, uf, city, birthDate });
+    insertNewCustomer = async ({ personType, name, document, phone, UF, city, birthDate }) => {
+        await this.utils.newCustomerValidation({ personType, name, document, phone, UF, city, birthDate });
         const formattedDocument = this.utils.formatDocument(document);
-        await this.dao.insertNewCustomer({ type, name, document: formattedDocument, phone, uf, city, birthDate });
+        await this.dao.insertNewCustomer({ personType, name, document: formattedDocument, phone, UF, city, birthDate });
     }
 
-    getCustomerByCpf = async (cpf, uf, city) => {
-        this.utils.validatePfArgs(cpf, uf, city);
-        return this.dao.getCustomerByDocumentUfCity(cpf, uf, city);
+    getCustomerByCpf = async (cpf, UF, city) => {
+        this.utils.validatePfArgs(cpf, UF, city);
+        return this.dao.getCustomerByDocumentUFCity(cpf, UF, city);
     }
 
-    getCustomerByCnpjUfCity = async (cnpj, uf, city) => {
-        this.utils.validatePjArgs(cnpj, uf, city);
-        return this.dao.getCustomerByDocumentUfCity(cnpj, uf, city);
+    getCustomerById = async (id) => {
+        return this.dao.getCustomerById(id);
     }
 
-    updateCustomer = async ({ id, type, name, document, uf, city, phone }) => {
-        await this.utils.updateCustomerValidation({ id, type, name, document, uf, city, phone });
+    getCustomerByCnpjUfCity = async (cnpj, UF, city) => {
+        this.utils.validatePjArgs(cnpj, UF, city);
+        return this.dao.getCustomerByDocumentUFCity(cnpj, UF, city);
+    }
+
+    updateCustomer = async ({ id, personType, name, document, UF, city, phone }) => {
+        await this.utils.updateCustomerValidation({ id, personType, name, document, UF, city, phone });
         const formattedDocument = this.utils.formatDocument(document);
-        await this.dao.updateCustomerById({ id, type, name, document: formattedDocument, uf, city, phone });
+        await this.dao.updateCustomerById({ id, personType, name, document: formattedDocument, UF, city, phone });
     }
 
     removeCustomer = async (id) => {
@@ -34,11 +38,9 @@ class CustomerService {
     }
 
     getPaginatedCustomerList = async (page, itemsPerPage) => {
-        return this.dao.getPaginatedCustomersList(page, itemsPerPage);
-    }
-
-    getTotalCustomers = async () => {
-        return this.dao.getTotalCustomers();
+        const data = await this.dao.getPaginatedCustomersList(page, itemsPerPage);
+        const count = await this.dao.getTotalCustomers();
+        return { data, count };
     }
 }
 

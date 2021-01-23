@@ -6,17 +6,32 @@ class CustomerService {
         this.api = environment.apiUrl;
     }
 
-    getCustomer = async ({ document, uf, city, type }) => {
-        const path = `${type}/${document}/${uf}/${city}`;
+    getCustomer = async ({ document, UF, city, personType }) => {
+        const path = `${personType}/${document}/${UF}/${city}`;
         const response = await axios.get(`${this.api}/customers/${path}`);
 
-        const result = {
+        const result = response.data ? {
             name: response.data.name,
             document: response.data.document,
-            uf: response.data.uf,
+            UF: response.data.UF,
             city: response.data.city,
             phone: response.data.phone,
-        };
+        } : {};
+
+        return { statusCode: response.status, result };
+    }
+
+    getCustomerById = async (id) => {
+        const response = await axios.get(`${this.api}/customers/${id}`);
+
+        const result = response.data ? {
+            personType: response.data.personType,
+            name: response.data.name,
+            document: response.data.document,
+            UF: response.data.UF,
+            city: response.data.city,
+            phone: response.data.phone,
+        } : {};
 
         return { statusCode: response.status, result };
     }
@@ -27,15 +42,13 @@ class CustomerService {
         };
 
         const listResponse = await axios.get(`${this.api}/customers/`, { params: queryParams });
-        const countResponse = await axios.get(`${this.api}/customers/total`);
-
-        const totalCountData = countResponse.data;
+        const totalCountData = listResponse.data.count;
         const list = [];
 
-        listResponse.data.forEach(item => {
+        listResponse.data.data.forEach(item => {
             list.push({
                 id: item._id,
-                type: item.type === 'PJ' ? 'Jurídica' : 'Física',
+                personType: item.personType === 'PJ' ? 'Jurídica' : 'Física',
                 name: item.name,
                 document: item.document,
                 phone: item.phone,
@@ -54,9 +67,9 @@ class CustomerService {
         return { statusCode: 200, result };
     }
 
-    insertNewCustomer = async ({ type, name, document, phone, uf, city, birthDate }) => {
+    insertNewCustomer = async ({ personType, name, document, phone, UF, city, birthDate }) => {
         const body = {
-            type, name, document, phone, uf, city, birthDate
+            personType, name, document, phone, UF, city, birthDate
         };
 
         const response = await axios.post(`${this.api}/customers/`, body);
@@ -64,12 +77,12 @@ class CustomerService {
         return { statusCode: response.status, result: {} };
     }
 
-    updateCustomer = async ({ id, type, name, document, uf, city, phone }) => {
+    updateCustomer = async ({ id, personType, name, document, UF, city, phone }) => {
         const body = {
-            id, type, name, document, uf, city, phone
+            personType, name, document, UF, city, phone
         };
 
-        const response = await axios.put(`${this.api}/customers/`, body);
+        const response = await axios.put(`${this.api}/customers/${id}`, body);
 
         return { statusCode: response.status, result: {} };
     }

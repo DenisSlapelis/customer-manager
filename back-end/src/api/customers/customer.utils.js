@@ -9,36 +9,36 @@ class CustomerUtils {
         this.dao = new CustomerDAO();
     }
 
-    newCustomerValidation = async ({ type, name, document, phone, uf, city, birthDate }) => {
-        this.typeValidation(type);
+    newCustomerValidation = async ({ personType, name, document, phone, UF, city, birthDate }) => {
+        this.personTypeValidation(personType);
         this.nameValidation(name);
-        this.documentValidation(type, document);
+        this.documentValidation(personType, document);
         this.phoneValidation(phone);
-        this.ufValidation(uf);
+        this.UFValidation(UF);
         this.cityValidation(city);
         this.birthDateValidation(birthDate);
         await this.checksIfCustomerAlreadyExists(document);
     }
 
-    updateCustomerValidation = async ({ id, type, name, document, phone, uf, city, birthDate }) => {
+    updateCustomerValidation = async ({ id, personType, name, document, phone, UF, city }) => {
         this.idValidation(id);
-        this.typeValidation(type);
+        this.personTypeValidation(personType);
         this.nameValidation(name);
-        this.documentValidation(type, document);
+        this.documentValidation(personType, document);
         this.phoneValidation(phone);
-        this.ufValidation(uf);
+        this.UFValidation(UF);
         this.cityValidation(city);
     }
 
-    validatePfArgs = (cnpj, uf, city) => {
+    validatePfArgs = (cnpj, UF, city) => {
         this.documentValidation('PF', cnpj);
-        this.ufValidation(uf);
+        this.UFValidation(UF);
         this.cityValidation(city);
     }
 
-    validatePjArgs = (cnpj, uf, city) => {
+    validatePjArgs = (cnpj, UF, city) => {
         this.documentValidation('PJ', cnpj);
-        this.ufValidation(uf);
+        this.UFValidation(UF);
         this.cityValidation(city);
     }
 
@@ -47,14 +47,14 @@ class CustomerUtils {
             throw new CustomError('Required param id was not found', 'Validation Error');
     }
 
-    typeValidation = (type) => {
-        if (!type)
-            throw new CustomError('Required param type was not found', 'Validation Error');
+    personTypeValidation = (personType) => {
+        if (!personType)
+            throw new CustomError('Required param personType was not found', 'Validation Error');
 
-        const validTypes = ['PF', 'PJ'];
+        const validpersonTypes = ['PF', 'PJ'];
 
-        if (!validTypes.includes(type.toUpperCase()))
-            throw new CustomError('Invalid person type', 'Validation Error');
+        if (!validpersonTypes.includes(personType.toUpperCase()))
+            throw new CustomError('Invalid person personType', 'Validation Error');
     }
 
     nameValidation = (name) => {
@@ -62,11 +62,11 @@ class CustomerUtils {
             throw new CustomError('Required param name was not found', 'Validation Error');
     }
 
-    documentValidation = (type, document) => {
+    documentValidation = (personType, document) => {
         if (!document)
             throw new CustomError('Required param document was not found', 'Validation Error');
 
-        type == 'PJ' ? this.cnpjValidation(document) : this.cpfValidation(document);
+        personType == 'PJ' ? this.cnpjValidation(document) : this.cpfValidation(document);
     }
 
     cpfValidation = (cpf) => {
@@ -93,11 +93,11 @@ class CustomerUtils {
             throw new CustomError('Invalid phone number', 'Validation Error');
     }
 
-    ufValidation = (uf) => {
-        if (!uf)
-            throw new CustomError('Required param uf was not found', 'Validation Error');
+    UFValidation = (UF) => {
+        if (!UF)
+            throw new CustomError('Required param UF was not found', 'Validation Error');
 
-        const validUf = [
+        const validUF = [
             'RO', 'SE', 'BA', 'MG', 'ES',
             'RJ', 'SP', 'PR', 'SC', 'RS',
             'MS', 'MT', 'GO', 'DF', 'AC',
@@ -106,8 +106,8 @@ class CustomerUtils {
             'PE', 'AL'
         ]
 
-        if (!validUf.includes(uf.toUpperCase()))
-            throw new CustomError('Invalid uf', 'Validation Error');
+        if (!validUF.includes(UF.toUpperCase()))
+            throw new CustomError('Invalid UF', 'Validation Error');
     }
 
     cityValidation = (city) => {
