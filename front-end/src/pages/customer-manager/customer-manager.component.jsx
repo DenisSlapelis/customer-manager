@@ -7,6 +7,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import ReCAPTCHA from "react-google-recaptcha";
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const CustomerManagerPage = () => {
     const [page, setPage] = useState(1);
@@ -21,11 +22,12 @@ const CustomerManagerPage = () => {
     const reRef = useRef();
 
     useEffect(() => {
+        setOpen(false);
+        setLoadingData(true);
+
         reRef.current.executeAsync().then(captcha => {
             reRef.current.reset();
 
-            setOpen(false);
-            setLoadingData(true);
             service.getCustomersList(captcha, page, itemsPerPage)
                 .then(response => {
                     const result = response.data;
@@ -34,15 +36,19 @@ const CustomerManagerPage = () => {
                         totalItems: result.totalItems,
                         totalPages: result.totalPages,
                     });
+                    setLoadingData(false);
                 })
                 .catch(err => {
                     console.log(err.response.data)
                     const message = err.response.data.message ? err.response.data.message : "Erro ao carregar dados";
                     setAlertMessage(message);
                     setOpen(true);
+                    setLoadingData(false)
                 });
+        }).catch(err => {
             setLoadingData(false);
-        }).catch(err => console.log('captcha error: ', err));
+            console.log('captcha error: ', err)
+        });
     }, [page, itemsPerPage, refreshList]);
 
 
@@ -90,6 +96,7 @@ const CustomerManagerPage = () => {
 
     return (
         <div>
+            { loadingData ? <LinearProgress /> : ''}
             <div className="page-header">
                 <h2>Gerenciando Pessoas Físicas e Jurídicas</h2>
             </div>

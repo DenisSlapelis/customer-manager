@@ -7,6 +7,7 @@ import CitiesSelect from '../../components/selects/cities/cities.component';
 import { Link, useParams } from 'react-router-dom';
 import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Alert from '@material-ui/lab/Alert';
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -19,9 +20,11 @@ const UpdateCustomerPage = () => {
     const [updated, setUpdated] = useState(false);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const reRef = useRef();
 
     useEffect(() => {
+        setIsLoading(true);
         reRef.current.executeAsync().then(captcha => {
             reRef.current.reset();
             setOpen(false);
@@ -29,13 +32,19 @@ const UpdateCustomerPage = () => {
                 .then(response => {
                     setCustomerData(response.data);
                     setSelectedUF(response.data.UF);
+                    setIsLoading(false);
                 }).catch(err => {
                     console.log(err.response.data)
                     const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
                     setAlertMessage(message);
                     setOpen(true);
+                    setIsLoading(false);
                 });
-        }).catch(err => console.log('captcha error: ', err));
+        }).catch(err => {
+            setIsLoading(false);
+            console.log('captcha error: ', err)
+        }
+        );
     }, [id]);
 
     const handlePersonTypeChange = (e) => {
@@ -48,6 +57,7 @@ const UpdateCustomerPage = () => {
     }
 
     const onSubmit = async ({ personType, name, document, UF, city, birthDate, phone }) => {
+        setIsLoading(true);
         const captcha = await reRef.current.executeAsync();
         reRef.current.reset();
         setOpen(false);
@@ -57,12 +67,14 @@ const UpdateCustomerPage = () => {
                 setAlertMessage("Pessoa atualizada com sucesso.");
                 setUpdated(true);
                 setOpen(true);
+                setIsLoading(false);
             })
             .catch(err => {
                 console.log(err.response.data)
                 const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
                 setAlertMessage(message);
                 setOpen(true);
+                setIsLoading(false);
             });
     }
 
@@ -77,6 +89,7 @@ const UpdateCustomerPage = () => {
 
     return (
         <div>
+            { isLoading ? <LinearProgress /> : ''}
             <div className="page-header">
                 <h2>Gerenciando Pessoas</h2>
                 <h3>Alteração de Pessoa Física/Jurídica</h3>

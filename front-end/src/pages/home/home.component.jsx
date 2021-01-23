@@ -9,6 +9,7 @@ import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import ReCAPTCHA from "react-google-recaptcha";
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import './home.styles.css';
 
@@ -20,8 +21,8 @@ const HomePage = () => {
     const [selectedUF, setSelectedUF] = useState('');
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const reRef = useRef();
-
 
     const handlePersonTypeChange = (e) => {
         setPersonType(e.target.value);
@@ -44,6 +45,7 @@ const HomePage = () => {
     };
 
     const onSubmit = async ({ personType, UF, city, document }) => {
+        setIsLoading(true);
         const captcha = await reRef.current.executeAsync();
         reRef.current.reset();
 
@@ -58,15 +60,18 @@ const HomePage = () => {
                     setCustomerData(result);
                     setFoundCustomer(found);
                 }
+                setIsLoading(false);
             }).catch(err => {
                 const message = err.response.data.message ? err.response.data.message : "Erro ao realizar busca. Preencha todos os dados";
                 setAlertMessage(message);
                 setOpen(true);
+                setIsLoading(false);
             });
     }
 
     return (
         <div>
+            { isLoading ? <LinearProgress /> : ''}
             <div className="page-header">
                 <h2>Lista pública de telefone</h2>
                 <h3>Selecione o tipo de busca e informe os dados para encontrar o número de telefone</h3>
