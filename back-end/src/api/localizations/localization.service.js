@@ -5,8 +5,12 @@ class LocalizationSerivce {
         this.dao = new LocalizationsDAO();
     }
 
-    getAllLocalizations = async () => {
-        return this.dao.getAllLocalizations();
+    getUFList = async () => {
+        return this.dao.getUFList();
+    }
+
+    getCityListByUF = async (UF) => {
+        return this.dao.getCityListByUF(UF);
     }
 }
 

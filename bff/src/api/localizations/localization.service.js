@@ -6,27 +6,22 @@ class LocalizationSerivce {
         this.api = environment.apiUrl;
     }
 
-    getAllLocalizations = async () => {
+    getUFList = async () => {
         const response = await axios.get(`${this.api}/localizations/`);
         const data = response.data;
-
-        const allUF = [];
-        const allCities = [];
+        const result = [];
 
         data.forEach(item => {
-            if (!allUF.includes(item.UF))
-                allUF.push(item.UF);
-
-            allCities.push({
-                UF: item.UF,
-                city: item.city
-            })
+            if (!result.includes(item.UF))
+                result.push(item.UF);
         });
 
-        const result = {
-            UF: allUF,
-            cities: allCities
-        };
+        return { statusCode: response.status, result };
+    }
+
+    getCityListByUF = async (UF) => {
+        const response = await axios.get(`${this.api}/localizations/${UF}`);
+        const result = response.data.map(item => (item.city));
 
         return { statusCode: response.status, result };
     }
