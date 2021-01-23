@@ -1,11 +1,4 @@
-.homepage {
-    margin: 5px;
-}
-
 .customerInfo {
+    padding: 10px;
     border: 1px solid;
-}
-
-label {
-    cursor: pointer;
 }

@@ -90,10 +90,10 @@ const CustomerManagerPage = () => {
 
     return (
         <div>
-            <div>
+            <div className="page-header">
                 <h2>Gerenciando Pessoas Físicas e Jurídicas</h2>
             </div>
-            <div>
+            <div className="page-header">
                 <Link to='/new-customer'>Criar Nova Pessoa</Link>
             </div>
             <ReCAPTCHA
@@ -169,8 +169,8 @@ const CustomerManagerPage = () => {
                     </tr>
                 </tfoot>
             </table>
-            <div>
-                <Link to='/'>
+            <div className="page-footer">
+                <Link to='/' >
                     Voltar a tela de Pesquisa de Telefone
                 </Link>
             </div>

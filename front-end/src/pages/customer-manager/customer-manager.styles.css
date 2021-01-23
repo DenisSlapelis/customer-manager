@@ -8,6 +8,11 @@ th, td {
     text-align: left;
 }
 
+table {
+    margin: 20px;
+    padding: 20px;
+}
+
 tbody {
     color: blue;
 }

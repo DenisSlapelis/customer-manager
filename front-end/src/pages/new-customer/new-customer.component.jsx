@@ -68,11 +68,11 @@ const NewCustomerPage = () => {
 
     return (
         <div>
-            <div>
+            <div className="page-header">
                 <h2>Gerenciando Pessoas</h2>
                 <h3>Criação de Pessoa Física/Jurídica</h3>
             </div>
-            <div>
+            <div className="form">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ReCAPTCHA
                         sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
@@ -81,24 +81,30 @@ const NewCustomerPage = () => {
                     />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
-                        <div>
+                        <div className="form-label">
                             <b>Informe {personType === "PF" ? "o Nome" : "a Razão Social"}:</b>
                         </div>
-                        <input type="text" name="name" placeholder={`Informe ${personType === "PF" ? "o Nome" : "a Razão Social"}`} ref={register} />
-                        <div>
+                        <input type="text" name="name" className="form-item" placeholder={`Informe ${personType === "PF" ? "o Nome" : "a Razão Social"}`} ref={register} />
+                        <div className="form-label">
                             <b>Informe o {personType === "PF" ? "CPF" : "CNPJ"}:</b>
                         </div>
-                        <DocumentInput register={register} personType={personType} />
-                        <div>
+                        <DocumentInput className="form-item" register={register} personType={personType} />
+                        <div className="form-label">
+                            <b>UF:</b>
+                        </div>
+                        <div className="form-item">
                             <UFSelect register={register} onChange={handleUFSelect} />
                         </div>
-                        <div>
+                        <div className="form-label">
+                            <b>Cidade:</b>
+                        </div>
+                        <div className="form-item">
                             <CitiesSelect register={register} UF={selectedUF} />
                         </div>
-                        <div>
+                        <div className="form-label">
                             <b>Data de Nascimento:</b>
                         </div>
-                        <input type="text" name="birthDate" defaultValue={selectedDate ? selectedDate.toLocaleDateString() : ""} placeholder={"Informe a Data de Nascimento"} ref={register} />
+                        <input type="text" name="birthDate" className="form-item" defaultValue={selectedDate ? selectedDate.toLocaleDateString() : ""} placeholder={"Informe a Data de Nascimento"} ref={register} />
                         <DatePicker
                             selected={startDate}
                             onChange={handleDatePicker}
@@ -108,16 +114,18 @@ const NewCustomerPage = () => {
                             dropdownMode="select"
                             customInput={<CalendarTodayTwoToneIcon />}
                         />
-                        <div>
+                        <div className="form-label">
                             <b>Informe o Telefone:</b>
                         </div>
-                        <input type="text" name="phone" placeholder={"Informe a Telefone"} ref={register} />
+                        <input type="text" name="phone" className="form-item" placeholder={"Informe a Telefone"} ref={register} />
                     </div>
                     <input type="submit" value="Salvar" />
                 </form>
+            </div>
+            <div className="page-footer">
                 <Link to='/customer-manager'>
                     Gerenciar Pessoa
-            </Link>
+                    </Link>
             </div>
             <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={created ? "success" : "error"}>

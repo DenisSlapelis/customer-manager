@@ -11,3 +11,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.homepage {
+  margin: 5px;
+}
+
+.page-header, .page-footer {
+  padding: 20px 10px 5px 20px;
+}
+
+label {
+  cursor: pointer;
+}
+
+.form {
+  margin: 20px 20px 5px 20px;
+  border: 1px solid;
+  max-width: 500px;
+  padding: 20px;
+}
+
+.form-label {
+  margin: 0px 0px 10px 0px;
+}
+
+.form-item {
+  margin: 0px 0px 20px 0px;
+}

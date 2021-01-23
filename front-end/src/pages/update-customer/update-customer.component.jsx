@@ -77,11 +77,11 @@ const UpdateCustomerPage = () => {
 
     return (
         <div>
-            <div>
+            <div className="page-header">
                 <h2>Gerenciando Pessoas</h2>
                 <h3>Alteração de Pessoa Física/Jurídica</h3>
             </div>
-            <div>
+            <div className="form">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ReCAPTCHA
                         sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
@@ -90,36 +90,44 @@ const UpdateCustomerPage = () => {
                     />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
-                        <div>
+                        <div className="form-label">
                             <b>Informe o Nome:</b>
                         </div>
-                        <input type="text" name="name" defaultValue={customerData.name} placeholder={"Informe o Nome"} ref={register} />
-                        <div>
+                        <input type="text" name="name" className="form-item" defaultValue={customerData.name} placeholder={"Informe o Nome"} ref={register} />
+                        <div className="form-label">
                             <b>Informe o {personType === "PF" ? "CPF" : "CNPJ"}:</b>
                         </div>
-                        <DocumentInput register={register} personType={personType} defaultValue={customerData.document} />
-                        <div>
+                        <DocumentInput register={register} className="form-item" personType={personType} defaultValue={customerData.document} />
+                        <div className="form-label">
+                            <b>UF:</b>
+                        </div>
+                        <div className="form-item">
                             <UFSelect register={register} onChange={handleUFSelect} defaultValue={customerData.UF} />
                         </div>
-                        <div>
+                        <div className="form-label">
+                            <b>Cidade:</b>
+                        </div>
+                        <div className="form-item">
                             <CitiesSelect register={register} UF={selectedUF} />
                         </div>
-                        <div>
+                        <div className="form-label">
                             <b>Informe o Telefone:</b>
                         </div>
-                        <input type="text" name="phone" defaultValue={customerData.phone} placeholder={"Informe a Telefone"} ref={register} />
+                        <input type="text" name="phone" className="form-item" defaultValue={customerData.phone} placeholder={"Informe a Telefone"} ref={register} />
                     </div>
                     <input type="submit" value="Salvar" />
                 </form>
+            </div>
+            <div className="page-footer">
                 <Link to='/customer-manager'>
                     Gerenciar Pessoa
                 </Link>
-                <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
-                    <Alert onClose={handleClose} severity={updated ? "success" : "error"}>
-                        {alertMessage}
-                    </Alert>
-                </Snackbar>
             </div>
+            <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={updated ? "success" : "error"}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }

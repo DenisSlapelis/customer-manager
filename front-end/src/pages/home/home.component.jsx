@@ -67,11 +67,11 @@ const HomePage = () => {
 
     return (
         <div>
-            <div>
+            <div className="page-header">
                 <h2>Lista pública de telefone</h2>
                 <h3>Selecione o tipo de busca e informe os dados para encontrar o número de telefone</h3>
             </div>
-            <div>
+            <div className="form">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ReCAPTCHA
                         sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
@@ -80,27 +80,29 @@ const HomePage = () => {
                     />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
-                        <div>
+                        <div className="form-label">
                             <b>Informe o {personType === "PF" ? "CPF" : "CNPJ"}:</b>
                         </div>
-                        <DocumentInput register={register} personType={personType} />
-                        <div>
+                        <DocumentInput className="form-item" register={register} personType={personType} />
+                        <div className="form-item">
                             <UFSelect register={register} onChange={handleUFSelect} />
                             <CitiesSelect register={register} UF={selectedUF} />
                         </div>
                     </div>
+                    {
+                        foundCustomer ?
+                            <div className="customerInfo form-item">
+                                <b>{personType === "PF" ? "Nome" : "Razão Social"}:</b> {customerData.name} <br />
+                                <b>{personType === "PF" ? "CPF" : "CNPJ"}:</b> {customerData.document} <br />
+                                <b>UF:</b> {customerData.UF} <br />
+                                <b>Cidade:</b> {customerData.city} <br />
+                                <b>Telefone:</b> {customerData.phone}
+                            </div> : ''
+                    }
                     <input type="submit" value="Buscar" />
                 </form>
-                {
-                    foundCustomer ?
-                        <div className="customerInfo">
-                            <b>{personType === "PF" ? "Nome" : "Razão Social"}:</b> {customerData.name} <br />
-                            <b>{personType === "PF" ? "CPF" : "CNPJ"}:</b> {customerData.document} <br />
-                            <b>UF:</b> {customerData.UF} <br />
-                            <b>Cidade:</b> {customerData.city} <br />
-                            <b>Telefone:</b> {customerData.phone}
-                        </div> : ''
-                }
+            </div>
+            <div className="page-footer">
                 <Link to='/customer-manager'>
                     Gerenciar Pessoa
                 </Link>
