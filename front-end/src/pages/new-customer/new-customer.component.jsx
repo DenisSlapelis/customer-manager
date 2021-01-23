@@ -16,6 +16,7 @@ const NewCustomerPage = () => {
     const { register, handleSubmit } = useForm();
     const [personType, setPersonType] = useState("PF");
     const [selectedUF, setSelectedUF] = useState('');
+    const [selectedDate, setSelectedDate] = useState();
     const [startDate, setStartDate] = useState(new Date());
     const [created, setCreated] = useState(false);
     const [open, setOpen] = useState(false);
@@ -28,6 +29,11 @@ const NewCustomerPage = () => {
     const handleUFSelect = (event) => {
         const UF = event.target.value;
         setSelectedUF(UF);
+    }
+
+    const handleDatePicker = (date) => {
+        setStartDate(date);
+        setSelectedDate(date);
     }
 
     const handleClose = (event, reason) => {
@@ -82,11 +88,14 @@ const NewCustomerPage = () => {
                         <div>
                             <b>Data de Nascimento:</b>
                         </div>
-                        <input type="text" name="birthDate" placeholder={"Informe a Data de Nascimento"} ref={register} />
-                        {/* <CalendarTodayTwoToneIcon /> */}
+                        <input type="text" name="birthDate" defaultValue={selectedDate ? selectedDate.toLocaleDateString() : ""} placeholder={"Informe a Data de Nascimento"} ref={register} />
                         <DatePicker
                             selected={startDate}
-                            onChange={date => setStartDate(date)}
+                            onChange={handleDatePicker}
+                            peekNextMonth
+                            showMonthDropdown
+                            showYearDropdown
+                            dropdownMode="select"
                             customInput={<CalendarTodayTwoToneIcon />}
                         />
                         <div>
