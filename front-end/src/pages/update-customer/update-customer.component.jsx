@@ -30,6 +30,7 @@ const UpdateCustomerPage = () => {
             setOpen(false);
             service.getCustomersById(captcha, id)
                 .then(response => {
+                    setPersonType(response.data.personType);
                     setCustomerData(response.data);
                     setSelectedUF(response.data.UF);
                     setIsLoading(false);
@@ -101,12 +102,17 @@ const UpdateCustomerPage = () => {
                         size="invisible"
                         ref={reRef}
                     />
-                    <PersonType register={register} onChange={handlePersonTypeChange} />
+                    {isLoading ?
+                        <PersonType personType={"PF"} register={register} onChange={handlePersonTypeChange} /> :
+                        <span>
+                            <PersonType personType={personType} register={register} onChange={handlePersonTypeChange} />
+                        </span>
+                    }
                     <div>
                         <div className="form-label">
-                            <b>Informe o Nome:</b>
+                            <b>Informe {personType === "PF" ? "o Nome" : "a Razão Social"}:</b>
                         </div>
-                        <input type="text" name="name" className="form-item" defaultValue={customerData.name} placeholder={"Informe o Nome"} ref={register} />
+                        <input type="text" name="name" className="form-item" defaultValue={customerData.name} placeholder={`Informe ${personType === "PF" ? "o Nome" : "a Razão Social"}`} ref={register} />
                         <div className="form-label">
                             <b>Informe o {personType === "PF" ? "CPF" : "CNPJ"}:</b>
                         </div>
@@ -133,7 +139,7 @@ const UpdateCustomerPage = () => {
             </div>
             <div className="page-footer">
                 <Link to='/customer-manager'>
-                    Gerenciar Pessoa
+                    Voltar a Tela de Gerenciar Pessoas
                 </Link>
             </div>
             <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
