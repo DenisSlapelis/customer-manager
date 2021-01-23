@@ -18,7 +18,7 @@ class CustomerService {
             document: this.formatDocument(response.data.document, personType),
             UF: response.data.UF,
             city: response.data.city,
-            phone: response.data.phone,
+            phone: this.formatPhone(response.data.phone),
         } : {};
 
         return { statusCode: response.status, result };
@@ -35,7 +35,7 @@ class CustomerService {
             document: this.formatDocument(response.data.document, personType),
             UF: response.data.UF,
             city: response.data.city,
-            phone: response.data.phone,
+            phone: this.formatPhone(response.data.phone),
         } : {};
 
         return { statusCode: response.status, result };
@@ -58,7 +58,7 @@ class CustomerService {
                 personType: personType === 'PF' ? 'Física' : 'Jurídica',
                 name: item.name,
                 document: this.formatDocument(item.document, personType),
-                phone: item.phone,
+                phone: this.formatPhone(item.phone),
                 city: item.city
             })
         });
@@ -113,6 +113,16 @@ class CustomerService {
         const documentString = document.toString().padStart(documentLength[type], '0');
 
         return personTypeMap[type].format(documentString);
+    }
+
+    formatPhone = (phone) => {
+        phone = phone.toString();
+        const ddd = phone.substr(0, 2);
+        const isCellPhone = phone.length - 2 > 8;
+        const firstPart = phone.substr(2, (isCellPhone ? 5 : 4));
+        const secondPart = phone.substr((isCellPhone ? 7 : 6), 4);
+
+        return `(${ddd}) ${firstPart}-${secondPart}`;
     }
 }
 

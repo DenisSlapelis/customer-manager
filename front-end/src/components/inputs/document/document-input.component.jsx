@@ -7,6 +7,8 @@ const DocumentInput = ({ register, personType, defaultValue, className }) => {
             placeholder={`Informe o ${personType === "PF" ? "CPF" : "CNPJ"}`}
             defaultValue={defaultValue}
             name="document"
+            minLength={11}
+            maxLength={18}
             className={className}
             ref={register}
         />

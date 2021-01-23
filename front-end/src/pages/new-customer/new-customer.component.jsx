@@ -117,7 +117,7 @@ const NewCustomerPage = () => {
                         <div className="form-label">
                             <b>Informe o Telefone:</b>
                         </div>
-                        <input type="text" name="phone" className="form-item" placeholder={"Informe a Telefone"} ref={register} />
+                        <input type="text" name="phone" className="form-item" minLength={10} maxLength={11} placeholder={"Informe a Telefone"} ref={register} />
                     </div>
                     <input type="submit" value="Salvar" />
                 </form>
