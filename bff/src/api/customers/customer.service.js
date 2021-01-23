@@ -1,9 +1,12 @@
 const environment = require('../../environment/environment');
 const axios = require('axios');
+const documentValidator = require('cpf-cnpj-validator');
 
 class CustomerService {
     constructor() {
         this.api = environment.apiUrl;
+        this.cpfFormatter = documentValidator.cpf;
+        this.cnpjFormatter = documentValidator.cnpj;
     }
 
     getCustomer = async ({ document, UF, city, personType }) => {
@@ -12,7 +15,7 @@ class CustomerService {
 
         const result = response.data ? {
             name: response.data.name,
-            document: response.data.document,
+            document: this.formatDocument(response.data.document, personType),
             UF: response.data.UF,
             city: response.data.city,
             phone: response.data.phone,
@@ -24,10 +27,12 @@ class CustomerService {
     getCustomerById = async (id) => {
         const response = await axios.get(`${this.api}/customers/${id}`);
 
+        const personType = response.data ? response.data.personType : "PF";
+
         const result = response.data ? {
-            personType: response.data.personType,
+            personType,
             name: response.data.name,
-            document: response.data.document,
+            document: this.formatDocument(response.data.document, personType),
             UF: response.data.UF,
             city: response.data.city,
             phone: response.data.phone,
@@ -46,11 +51,13 @@ class CustomerService {
         const list = [];
 
         listResponse.data.data.forEach(item => {
+            const personType = item.personType;
+
             list.push({
                 id: item._id,
-                personType: item.personType === 'PJ' ? 'Jurídica' : 'Física',
+                personType: personType === 'PF' ? 'Física' : 'Jurídica',
                 name: item.name,
-                document: item.document,
+                document: this.formatDocument(item.document, personType),
                 phone: item.phone,
                 city: item.city
             })
@@ -91,6 +98,21 @@ class CustomerService {
         const response = await axios.delete(`${this.api}/customers/${id}`);
 
         return { statusCode: response.status, result: {} };
+    }
+
+    formatDocument = (document, type) => {
+        const personTypeMap = {
+            'PF': this.cpfFormatter,
+            'PJ': this.cnpjFormatter
+        };
+        const documentLength = {
+            'PF': 11,
+            'PJ': 14
+        };
+
+        const documentString = document.toString().padStart(documentLength[type], '0');
+
+        return personTypeMap[type].format(documentString);
     }
 }
 
