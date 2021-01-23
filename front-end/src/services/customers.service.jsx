@@ -1,40 +1,46 @@
 
 import axios from 'axios';
 
-export const addNewCustomer = async ({ personType, name, document, UF, city, birthDate, phone }) => {
+export const addNewCustomer = async ({ captcha, personType, name, document, UF, city, birthDate, phone }) => {
+    const headers = { captcha };
     const body = {
         personType, name, document, UF, city, birthDate, phone
     };
-    return axios.post(`http://localhost:3002/api/v1/customers`, body);
+    return axios.post(`http://localhost:3002/api/v1/customers`, body, { headers });
 }
 
-export const getCustomersList = async (page, itemsPerPage) => {
+export const getCustomersList = async (captcha, page, itemsPerPage) => {
+    const headers = { captcha };
     const params = {
         page,
         itemsPerPage,
     };
 
-    return axios.get(`http://localhost:3002/api/v1/customers`, { params });
+    return axios.get(`http://localhost:3002/api/v1/customers`, { headers, params });
 }
 
-export const getCustomersById = async (id) => {
-    return axios.get(`http://localhost:3002/api/v1/customers/${id}`);
+export const getCustomersById = async (captcha, id) => {
+    const headers = { captcha };
+    return axios.get(`http://localhost:3002/api/v1/customers/${id}`, { headers });
 }
 
-export const getCustomersByDocumentUFCity = async (document, UF, city, personType) => {
+export const getCustomersByDocumentUFCity = async (document, UF, city, personType, captcha) => {
+    const headers = { captcha };
     const params = {
         personType
     };
-    return axios.get(`http://localhost:3002/api/v1/customers/${document}/${UF}/${city}`, { params });
+    return axios.get(`http://localhost:3002/api/v1/customers/${document}/${UF}/${city}`, { headers, params });
 }
 
-export const updateCustomer = async ({ id, personType, name, document, UF, city, birthDate, phone }) => {
+export const updateCustomer = async ({ captcha, id, personType, name, document, UF, city, birthDate, phone }) => {
+    const headers = { captcha };
     const body = {
         personType, name, document, UF, city, birthDate, phone
     };
-    return axios.put(`http://localhost:3002/api/v1/customers/${id}`, body);
+    return axios.put(`http://localhost:3002/api/v1/customers/${id}`, body, { headers });
 }
 
-export const removeCustomer = async (id) => {
-    return axios.delete(`http://localhost:3002/api/v1/customers/${id}`);
+export const removeCustomer = async (captcha, id) => {
+    const headers = { captcha };
+    return axios.delete(`http://localhost:3002/api/v1/customers/${id}`, { headers });
 }

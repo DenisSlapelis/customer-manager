@@ -6,7 +6,8 @@ class Environment {
         this.apiHost = process.env.BACKEND_API_HOST || 'http://localhost:3004';
         this.apiPath = process.env.BACKEND_API_PATH || '/api/v1';
         this.apiUrl = this.apiHost + this.apiPath;
-        this.port = process.env.PORT || 3000;
+        this.port = process.env.PORT || 3002;
+        this.captchaKey = process.env.CAPTCHA_SECRET_KEY;
     }
 
 }

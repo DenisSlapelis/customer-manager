@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import PersonType from '../../components/inputs/person-type/person-type.component';
 import DocumentInput from '../../components/inputs/document/document-input.component';
@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import ReCAPTCHA from "react-google-recaptcha";
 
 import './home.styles.css';
 
@@ -19,6 +20,8 @@ const HomePage = () => {
     const [selectedUF, setSelectedUF] = useState('');
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const reRef = useRef();
+
 
     const handlePersonTypeChange = (e) => {
         setPersonType(e.target.value);
@@ -40,8 +43,11 @@ const HomePage = () => {
         setOpen(false);
     };
 
-    const onSubmit = ({ personType, UF, city, document }) => {
-        service.getCustomersByDocumentUFCity(document, UF, city, personType)
+    const onSubmit = async ({ personType, UF, city, document }) => {
+        const captcha = await reRef.current.executeAsync();
+        reRef.current.reset();
+
+        service.getCustomersByDocumentUFCity(document, UF, city, personType, captcha)
             .then(response => {
                 const result = response.data;
                 const found = result.hasOwnProperty('name');
@@ -53,8 +59,7 @@ const HomePage = () => {
                     setFoundCustomer(found);
                 }
             }).catch(err => {
-                console.log(err.response.data)
-                const message = err.response.data.message ? err.response.data.message : "Erro ao realizar busca";
+                const message = err.response.data.message ? err.response.data.message : "Erro ao realizar busca. Preencha todos os dados";
                 setAlertMessage(message);
                 setOpen(true);
             });
@@ -68,6 +73,11 @@ const HomePage = () => {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
+                    <ReCAPTCHA
+                        sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
+                        size="invisible"
+                        ref={reRef}
+                    />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
                         <div>

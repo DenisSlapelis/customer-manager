@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import PersonType from '../../components/inputs/person-type/person-type.component';
 import DocumentInput from '../../components/inputs/document/document-input.component';
@@ -10,7 +10,8 @@ import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css'
+import 'react-datepicker/dist/react-datepicker.css';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const NewCustomerPage = () => {
     const { register, handleSubmit } = useForm();
@@ -21,6 +22,7 @@ const NewCustomerPage = () => {
     const [created, setCreated] = useState(false);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const reRef = useRef();
 
     const handlePersonTypeChange = (e) => {
         setPersonType(e.target.value);
@@ -44,10 +46,13 @@ const NewCustomerPage = () => {
         setOpen(false);
     };
 
-    const onSubmit = ({ personType, name, document, UF, city, birthDate, phone }) => {
+    const onSubmit = async ({ personType, name, document, UF, city, birthDate, phone }) => {
+        const captcha = await reRef.current.executeAsync();
+        reRef.current.reset();
+
         setOpen(false);
         setCreated(false);
-        service.addNewCustomer({ personType, name, document, UF, city, birthDate, phone })
+        service.addNewCustomer({ captcha, personType, name, document, UF, city, birthDate, phone })
             .then(() => {
                 setCreated(true);
                 setAlertMessage("Pessoa cadastrada com sucesso.");
@@ -69,6 +74,11 @@ const NewCustomerPage = () => {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
+                    <ReCAPTCHA
+                        sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
+                        size="invisible"
+                        ref={reRef}
+                    />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
                         <div>

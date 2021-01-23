@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './customer-manager.styles.css';
 import * as service from '../../services/customers.service';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const CustomerManagerPage = () => {
     const [page, setPage] = useState(1);
@@ -17,33 +18,41 @@ const CustomerManagerPage = () => {
     const [removed, setRemoved] = useState(false);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const reRef = useRef();
 
     useEffect(() => {
-        setOpen(false);
-        setLoadingData(true);
-        service.getCustomersList(page, itemsPerPage)
-            .then(response => {
-                const result = response.data;
-                setCustomerList(result.data);
-                setPaginationInfo({
-                    totalItems: result.totalItems,
-                    totalPages: result.totalPages,
+        reRef.current.executeAsync().then(captcha => {
+            reRef.current.reset();
+
+            setOpen(false);
+            setLoadingData(true);
+            service.getCustomersList(captcha, page, itemsPerPage)
+                .then(response => {
+                    const result = response.data;
+                    setCustomerList(result.data);
+                    setPaginationInfo({
+                        totalItems: result.totalItems,
+                        totalPages: result.totalPages,
+                    });
+                })
+                .catch(err => {
+                    console.log(err.response.data)
+                    const message = err.response.data.message ? err.response.data.message : "Erro ao carregar dados";
+                    setAlertMessage(message);
+                    setOpen(true);
                 });
-            })
-            .catch(err => {
-                console.log(err.response.data)
-                const message = err.response.data.message ? err.response.data.message : "Erro ao carregar dados";
-                setAlertMessage(message);
-                setOpen(true);
-            });
-        setLoadingData(false);
+            setLoadingData(false);
+        }).catch(err => console.log('captcha error: ', err));
     }, [page, itemsPerPage, refreshList]);
 
 
-    const handleRemoveClick = (id) => {
+    const handleRemoveClick = async (id) => {
+        const captcha = await reRef.current.executeAsync();
+        reRef.current.reset();
+
         setOpen(false);
         setRemoved(false);
-        service.removeCustomer(id).then(() => {
+        service.removeCustomer(captcha, id).then(() => {
             setRemoved(true);
             setAlertMessage("Pessoa removida com sucesso.");
             setOpen(true);
@@ -87,6 +96,11 @@ const CustomerManagerPage = () => {
             <div>
                 <Link to='/new-customer'>Criar Nova Pessoa</Link>
             </div>
+            <ReCAPTCHA
+                sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
+                size="invisible"
+                ref={reRef}
+            />
             <table>
                 <thead>
                     <tr>

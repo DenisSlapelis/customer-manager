@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import PersonType from '../../components/inputs/person-type/person-type.component';
 import DocumentInput from '../../components/inputs/document/document-input.component';
@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const UpdateCustomerPage = () => {
     const { register, handleSubmit } = useForm();
@@ -18,19 +19,23 @@ const UpdateCustomerPage = () => {
     const [updated, setUpdated] = useState(false);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const reRef = useRef();
 
     useEffect(() => {
-        setOpen(false);
-        service.getCustomersById(id)
-            .then(response => {
-                setCustomerData(response.data);
-                setSelectedUF(response.data.UF);
-            }).catch(err => {
-                console.log(err.response.data)
-                const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
-                setAlertMessage(message);
-                setOpen(true);
-            });
+        reRef.current.executeAsync().then(captcha => {
+            reRef.current.reset();
+            setOpen(false);
+            service.getCustomersById(captcha, id)
+                .then(response => {
+                    setCustomerData(response.data);
+                    setSelectedUF(response.data.UF);
+                }).catch(err => {
+                    console.log(err.response.data)
+                    const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
+                    setAlertMessage(message);
+                    setOpen(true);
+                });
+        }).catch(err => console.log('captcha error: ', err));
     }, [id]);
 
     const handlePersonTypeChange = (e) => {
@@ -42,10 +47,12 @@ const UpdateCustomerPage = () => {
         setSelectedUF(UF);
     }
 
-    const onSubmit = ({ personType, name, document, UF, city, birthDate, phone }) => {
+    const onSubmit = async ({ personType, name, document, UF, city, birthDate, phone }) => {
+        const captcha = await reRef.current.executeAsync();
+        reRef.current.reset();
         setOpen(false);
         setUpdated(false);
-        service.updateCustomer({ id, personType, name, document, UF, city, birthDate, phone })
+        service.updateCustomer({ captcha, id, personType, name, document, UF, city, birthDate, phone })
             .then(() => {
                 setAlertMessage("Pessoa atualizada com sucesso.");
                 setUpdated(true);
@@ -76,6 +83,11 @@ const UpdateCustomerPage = () => {
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
+                    <ReCAPTCHA
+                        sitekey="6LdQ9zgaAAAAAOPsEwRC2zbjD-PJvcJ1x202QJo0"
+                        size="invisible"
+                        ref={reRef}
+                    />
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
                         <div>
