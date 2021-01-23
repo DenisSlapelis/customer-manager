@@ -13,7 +13,7 @@ const CustomerManagerPage = () => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [customerList, setCustomerList] = useState([]);
-    const [paginationInfo, setPaginationInfo] = useState({});
+    const [paginationInfo, setPaginationInfo] = useState({ totalItems: 0, totalPages: 0 });
     const [loadingData, setLoadingData] = useState(true);
     const [refreshList, setRefreshList] = useState(false);
     const [removed, setRemoved] = useState(false);
