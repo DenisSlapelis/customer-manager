@@ -1,25 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import PersonType from '../../components/inputs/person-type/person-type.component';
 import DocumentInput from '../../components/inputs/document/document-input.component';
 import UFSelect from '../../components/selects/uf/uf-select.component';
 import CitiesSelect from '../../components/selects/cities/cities.component';
-import { Link } from 'react-router-dom';
-import CalendarTodayTwoToneIcon from '@material-ui/icons/CalendarTodayTwoTone';
+import { Link, useParams } from 'react-router-dom';
 import * as service from '../../services/customers.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
-import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css'
 
-const NewCustomerPage = () => {
+const UpdateCustomerPage = () => {
     const { register, handleSubmit } = useForm();
+    const { id } = useParams();
     const [personType, setPersonType] = useState("PF");
+    const [customerData, setCustomerData] = useState({});
     const [selectedUF, setSelectedUF] = useState('');
-    const [startDate, setStartDate] = useState(new Date());
-    const [created, setCreated] = useState(false);
+    const [updated, setUpdated] = useState(false);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+
+    useEffect(() => {
+        setOpen(false);
+        service.getCustomersById(id)
+            .then(response => {
+                setCustomerData(response.data);
+                setSelectedUF(response.data.UF);
+            }).catch(err => {
+                console.log(err.response.data)
+                const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
+                setAlertMessage(message);
+                setOpen(true);
+            });
+    }, [id]);
 
     const handlePersonTypeChange = (e) => {
         setPersonType(e.target.value);
@@ -30,6 +42,23 @@ const NewCustomerPage = () => {
         setSelectedUF(UF);
     }
 
+    const onSubmit = ({ personType, name, document, UF, city, birthDate, phone }) => {
+        setOpen(false);
+        setUpdated(false);
+        service.updateCustomer({ id, personType, name, document, UF, city, birthDate, phone })
+            .then(() => {
+                setAlertMessage("Pessoa atualizada com sucesso.");
+                setUpdated(true);
+                setOpen(true);
+            })
+            .catch(err => {
+                console.log(err.response.data)
+                const message = err.response.data.message ? err.response.data.message : "Erro ao atualizar dados";
+                setAlertMessage(message);
+                setOpen(true);
+            });
+    }
+
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -38,75 +67,49 @@ const NewCustomerPage = () => {
         setOpen(false);
     };
 
-    const onSubmit = ({ personType, name, document, UF, city, birthDate, phone }) => {
-        setOpen(false);
-        setCreated(false);
-        service.addNewCustomer({ personType, name, document, UF, city, birthDate, phone })
-            .then(() => {
-                setCreated(true);
-                setAlertMessage("Pessoa cadastrada com sucesso.");
-                setOpen(true);
-            })
-            .catch(err => {
-                console.log(err.response.data)
-                const message = err.response.data.message ? err.response.data.message : "Erro ao inserir dados";
-                setAlertMessage(message);
-                setOpen(true);
-            });
-    }
 
     return (
         <div>
             <div>
                 <h2>Gerenciando Pessoas</h2>
-                <h3>Criação de Pessoa Física/Jurídica</h3>
+                <h3>Alteração de Pessoa Física/Jurídica</h3>
             </div>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <PersonType register={register} onChange={handlePersonTypeChange} />
                     <div>
                         <div>
-                            <b>Informe {personType === "PF" ? "o Nome" : "a Razão Social"}:</b>
+                            <b>Informe o Nome:</b>
                         </div>
-                        <input type="text" name="name" placeholder={`Informe ${personType === "PF" ? "o Nome" : "a Razão Social"}`} ref={register} />
+                        <input type="text" name="name" defaultValue={customerData.name} placeholder={"Informe o Nome"} ref={register} />
                         <div>
                             <b>Informe o {personType === "PF" ? "CPF" : "CNPJ"}:</b>
                         </div>
-                        <DocumentInput register={register} personType={personType} />
+                        <DocumentInput register={register} personType={personType} defaultValue={customerData.document} />
                         <div>
-                            <UFSelect register={register} onChange={handleUFSelect} />
+                            <UFSelect register={register} onChange={handleUFSelect} defaultValue={customerData.UF} />
                         </div>
                         <div>
                             <CitiesSelect register={register} UF={selectedUF} />
                         </div>
                         <div>
-                            <b>Data de Nascimento:</b>
-                        </div>
-                        <input type="text" name="birthDate" placeholder={"Informe a Data de Nascimento"} ref={register} />
-                        {/* <CalendarTodayTwoToneIcon /> */}
-                        <DatePicker
-                            selected={startDate}
-                            onChange={date => setStartDate(date)}
-                            customInput={<CalendarTodayTwoToneIcon />}
-                        />
-                        <div>
                             <b>Informe o Telefone:</b>
                         </div>
-                        <input type="text" name="phone" placeholder={"Informe a Telefone"} ref={register} />
+                        <input type="text" name="phone" defaultValue={customerData.phone} placeholder={"Informe a Telefone"} ref={register} />
                     </div>
                     <input type="submit" value="Salvar" />
                 </form>
                 <Link to='/customer-manager'>
                     Gerenciar Pessoa
-            </Link>
+                </Link>
+                <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity={updated ? "success" : "error"}>
+                        {alertMessage}
+                    </Alert>
+                </Snackbar>
             </div>
-            <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity={created ? "success" : "error"}>
-                    {alertMessage}
-                </Alert>
-            </Snackbar>
         </div>
     )
 }
 
-export default NewCustomerPage;
+export default UpdateCustomerPage;

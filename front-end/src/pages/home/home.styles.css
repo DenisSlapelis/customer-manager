@@ -1,3 +1,11 @@
 .homepage {
     margin: 5px;
 }
+
+.customerInfo {
+    border: 1px solid;
+}
+
+label {
+    cursor: pointer;
+}

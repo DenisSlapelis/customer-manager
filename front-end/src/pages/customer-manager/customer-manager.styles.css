@@ -1,0 +1,25 @@
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+tbody {
+    color: blue;
+}
+
+tfoot{
+    color: black;
+}
+
+svg {
+    margin: 0px 5px 0px 10px;
+}
+
+svg:hover, span {
+    cursor: pointer;
+}

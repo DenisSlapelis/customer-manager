@@ -1,67 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import PersonType from '../../components/inputs/person-type/person-type.component';
 import DocumentInput from '../../components/inputs/document/document-input.component';
 import UFSelect from '../../components/selects/uf/uf-select.component';
 import CitiesSelect from '../../components/selects/cities/cities.component';
+import { Link } from 'react-router-dom';
+import * as service from '../../services/customers.service';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 import './home.styles.css';
 
 const HomePage = () => {
     const { register, handleSubmit } = useForm();
     const [personType, setPersonType] = useState("PF");
-    const [UFList, setUFList] = useState([]);
-    const [localizationsData, setLocalizationsData] = useState({});
-    const [cityList, setCityList] = useState([]);
     const [customerData, setCustomerData] = useState({});
-    const [foundUser, setFoundUser] = useState(false);
-
-    useEffect(() => {
-        fetch('http://localhost:3002/api/v1/localizations')
-            .then(response => response.json())
-            .then(response => {
-                setLocalizationsData(response);
-                setUFList(response.UF);
-            });
-    }, []);
+    const [foundCustomer, setFoundCustomer] = useState(false);
+    const [selectedUF, setSelectedUF] = useState('');
+    const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     const handlePersonTypeChange = (e) => {
         setPersonType(e.target.value);
-    }
-
-    const getCitiesByUF = (uf) => {
-        const result = localizationsData.cities.filter(item => {
-            return item.UF === uf;
-        });
-        setCityList(result);
+        setFoundCustomer(false);
+        setCustomerData({});
+        setOpen(false);
     }
 
     const handleUFSelect = (event) => {
         const UF = event.target.value;
-        getCitiesByUF(UF);
+        setSelectedUF(UF);
     }
 
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
+
     const onSubmit = ({ personType, UF, city, document }) => {
-        fetch(`http://localhost:3002/api/v1/customers/${document}/${UF}/${city}?type=${personType}`)
+        service.getCustomersByDocumentUFCity(document, UF, city, personType)
             .then(response => {
-                if (response.status !== 200)
-                    return false;
-
-                return response.json()
-            })
-            .then(response => {
-                if (!response) {
-                    setFoundUser(false);
-                    return;
+                const result = response.data;
+                const found = result.hasOwnProperty('name');
+                if (!found) {
+                    setAlertMessage("Pessoa não encontrada.");
+                    setOpen(true);
+                } else {
+                    setCustomerData(result);
+                    setFoundCustomer(found);
                 }
-
-                setFoundUser(true);
-                setCustomerData(response);
+            }).catch(err => {
+                console.log(err.response.data)
+                const message = err.response.data.message ? err.response.data.message : "Erro ao realizar busca";
+                setAlertMessage(message);
+                setOpen(true);
             });
     }
 
     return (
-        <div className='homepage'>
+        <div>
             <div>
                 <h2>Lista pública de telefone</h2>
                 <h3>Selecione o tipo de busca e informe os dados para encontrar o número de telefone</h3>
@@ -75,23 +75,31 @@ const HomePage = () => {
                         </div>
                         <DocumentInput register={register} personType={personType} />
                         <div>
-                            <UFSelect register={register} UFList={UFList} onChange={handleUFSelect} />
-                            <CitiesSelect register={register} cityList={cityList} />
+                            <UFSelect register={register} onChange={handleUFSelect} />
+                            <CitiesSelect register={register} UF={selectedUF} />
                         </div>
                     </div>
                     <input type="submit" value="Buscar" />
                 </form>
                 {
-                    foundUser ?
-                        <div>
-                            <b>Nome:</b> {customerData.name}
-                            <b>{personType === "PF" ? "CPF" : "CNPJ"}:</b> {customerData.document}
-                            <b>UF:</b> {customerData.UF}
-                            <b>Cidade:</b> {customerData.city}
+                    foundCustomer ?
+                        <div className="customerInfo">
+                            <b>{personType === "PF" ? "Nome" : "Razão Social"}:</b> {customerData.name} <br />
+                            <b>{personType === "PF" ? "CPF" : "CNPJ"}:</b> {customerData.document} <br />
+                            <b>UF:</b> {customerData.UF} <br />
+                            <b>Cidade:</b> {customerData.city} <br />
                             <b>Telefone:</b> {customerData.phone}
                         </div> : ''
                 }
+                <Link to='/customer-manager'>
+                    Gerenciar Pessoa
+                </Link>
             </div>
+            <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={"error"}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }
